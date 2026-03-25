@@ -137,18 +137,47 @@
 
   <!-- GAME END -->
   <div id="game-end" class="section hidden">
-    <h2>&#127937; Game Over</h2>
-    <div id="scores"></div>
-    <div id="voting">
-      <h3>Vote for Best Squad (not your own)</h3>
-      <div id="vote-list"></div>
-      <br>
-      <button id="submit-all-votes">Submit Votes</button>
+
+    <!-- Voting phase -->
+    <div id="voting-phase">
+      <div class="voting-header">
+        <div class="voting-icon">&#127891;</div>
+        <h2>Time to Vote!</h2>
+        <p class="voting-sub">Study every squad below, then cast your vote for the best one (not your own). Votes are worth <strong>+2 pts</strong> each.</p>
+      </div>
+
+      <!-- All squads shown for inspection -->
+      <div class="results-section">
+        <h3 class="results-heading">&#9917; All Squads</h3>
+        <div id="voting-squads" class="squad-showcase"></div>
+      </div>
+
+      <!-- Vote selects -->
+      <div class="results-section">
+        <h3 class="results-heading">&#128203; Cast Your Votes</h3>
+        <div id="vote-list" class="vote-list"></div>
+        <button id="submit-all-votes" class="btn-vote">Reveal Results &#127942;</button>
+      </div>
     </div>
+
+    <!-- Final results phase -->
     <div id="final-results" class="hidden">
-      <h3>&#127942; Final Results</h3>
-      <div id="final-scores"></div>
+      <!-- Winner banner -->
+      <div id="winner-banner" class="winner-banner"></div>
+
+      <!-- Leaderboard -->
+      <div class="results-section">
+        <h3 class="results-heading">&#127942; Leaderboard</h3>
+        <div id="leaderboard" class="leaderboard"></div>
+      </div>
+
+      <!-- Squad showcase -->
+      <div class="results-section">
+        <h3 class="results-heading">&#127939; Squad Showcase</h3>
+        <div id="squad-showcase" class="squad-showcase"></div>
+      </div>
     </div>
+
   </div>
 
   <script src="app.js"></script>

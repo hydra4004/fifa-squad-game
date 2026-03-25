@@ -646,29 +646,113 @@ function endGame() {
 function calculateScores() {
   gameState.players.forEach(player => {
     recalculateChemistry(player);
-    let totalRating = player.squad.reduce((s, p) => s + p.adjustedRating, 0);
-    let chemistry = player.squad.reduce((s, p) => s + (p.chemBonus || 0), 0);
-    const avgRating = totalRating / 11;
+    const totalRating = player.squad.reduce((s, p) => s + p.adjustedRating, 0);
+    const chemistry   = player.squad.reduce((s, p) => s + (p.chemBonus || 0), 0);
+    const avgRating   = totalRating / 11;
     const captainBoost = player.captain ? 2 : 0;
     const budgetPenalty = player.budget / 10;
-    player.score = avgRating + captainBoost - budgetPenalty;
-    player.totalChem = chemistry;
+    player.score      = avgRating + captainBoost - budgetPenalty;
+    player.totalChem  = chemistry;
+    player.avgRating  = avgRating;
   });
+}
 
-  const scoresDiv = document.getElementById('scores');
-  scoresDiv.innerHTML = '<h3>Scores</h3>' + gameState.players.map(p => {
-    const avg = (p.squad.reduce((s, pl) => s + pl.adjustedRating, 0) / 11).toFixed(1);
-    return `<p><strong>Player ${p.id}</strong>: ${p.score.toFixed(2)} pts &nbsp;|&nbsp; Avg Rating: ${avg} &nbsp;|&nbsp; Chem: ${p.totalChem} &nbsp;|&nbsp; Budget left: $${p.budget}M</p>`;
-  }).join('');
+// ─── Build a mini-pitch HTML for one manager ─────────────────────────────────
+function buildMiniPitch(manager) {
+  const isDefend = manager.formation === 'defend';
+
+  // Rows: attack top → GK bottom
+  const rows = isDefend
+    ? [['LW','ST','RW'], ['CM1','CDM','CM2'], ['LB','CB1','CB2','RB'], ['GK']]
+    : [['LW','ST','RW'], ['CAM'],             ['CM1','CM2'],           ['LB','CB1','CB2','RB'], ['GK']];
+
+  function posDisplayLabel(slotKey) {
+    if (slotKey === 'CDM') return 'DM';
+    return slotKey.replace(/\d+$/, '');
+  }
+
+  function slotHtml(slotKey) {
+    const footballer = manager.squad.find(p => p.assignedPos === slotKey);
+    const isCaptain  = footballer && manager.captain && manager.captain.name === footballer.name;
+    const posLabel   = posDisplayLabel(slotKey);
+    if (!footballer) {
+      return '<div class="mp-pos mp-empty"><span class="mp-pos-label">' + posLabel + '</span></div>';
+    }
+    const parts    = footballer.name.split(' ');
+    const lastName = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
+    const display  = lastName.length > 9 ? lastName.substring(0, 8) + '\u2026' : lastName;
+    const rating   = footballer.adjustedRating;
+    const cls      = rating >= 92 ? 'mp-gold' : rating >= 88 ? 'mp-silver' : 'mp-bronze';
+    return '<div class="mp-pos ' + cls + (isCaptain ? ' mp-captain' : '') + '">' +
+      (isCaptain ? '<span class="mp-armband">C</span>' : '') +
+      '<span class="mp-pos-label">' + posLabel + '</span>' +
+      '<span class="mp-name">' + display + '</span>' +
+      '<span class="mp-rating">' + rating + '</span>' +
+    '</div>';
+  }
+
+  const rowsHtml = rows.map(row =>
+    '<div class="mp-row">' + row.map(slotHtml).join('') + '</div>'
+  ).join('');
+
+  // Portrait pitch SVG — top = attack, bottom = GK
+  const pitchLines =
+    '<div class="pitch-lines">' +
+    '<svg viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">' +
+      '<rect x="10" y="10" width="280" height="400" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="1.5" rx="3"/>' +
+      '<line x1="10" y1="210" x2="290" y2="210" stroke="rgba(255,255,255,0.13)" stroke-width="1.2"/>' +
+      '<circle cx="150" cy="210" r="40" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="1.2"/>' +
+      '<circle cx="150" cy="210" r="3" fill="rgba(255,255,255,0.22)"/>' +
+      '<rect x="65" y="10" width="170" height="70" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>' +
+      '<rect x="105" y="10" width="90" height="28" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>' +
+      '<rect x="120" y="2" width="60" height="12" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"/>' +
+      '<rect x="65" y="340" width="170" height="70" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>' +
+      '<rect x="105" y="382" width="90" height="28" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>' +
+      '<rect x="120" y="406" width="60" height="12" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"/>' +
+    '</svg>' +
+    '</div>';
+
+  return '<div class="mini-pitch">' + pitchLines + '<div class="mp-rows">' + rowsHtml + '</div></div>';
 }
 
 function setupVoting() {
+  // ── Squad preview (all managers, unsorted) ──
+  const previewHtml = gameState.players.map(p => {
+    const formation = p.formation === 'defend' ? '4-3-3 Defend' : '4-3-3 Attack';
+    const captainName = p.captain ? p.captain.name : '—';
+    return `<div class="squad-card voting-squad-card">
+      <div class="squad-card-header">
+        <div>
+          <div class="squad-manager">Manager ${p.id}</div>
+          <div class="squad-meta">${formation} &nbsp;·&nbsp; &#127894; ${captainName}</div>
+        </div>
+        <div class="squad-pts" style="font-size:14px;color:#94a3b8;">Avg &#11088; ${(p.squad.reduce((s,pl)=>s+pl.adjustedRating,0)/11).toFixed(1)}</div>
+      </div>
+      ${buildMiniPitch(p)}
+      <div class="squad-player-list">
+        ${p.squad.map(pl => {
+          const isCaptain = p.captain && p.captain.name === pl.name;
+          return `<div class="spl-row">
+            <span class="spl-pos">${pl.assignedPos ? pl.assignedPos.replace(/\d+$/,'') : '?'}</span>
+            <span class="spl-name">${pl.name}${isCaptain ? ' &#127894;' : ''}</span>
+            <span class="spl-club">${pl.club}</span>
+            <span class="spl-rating">${pl.adjustedRating}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('voting-squads').innerHTML = previewHtml;
+
+  // ── Vote selects ──
   const voteList = document.getElementById('vote-list');
   voteList.innerHTML = gameState.players.map(voter =>
-    `<div style="margin:8px 0">
-      <label>Player ${voter.id} votes for best squad:</label>
+    `<div class="vote-row">
+      <label>Manager ${voter.id} votes for:</label>
       <select class="vote-select" data-voter="${voter.id}">
-        ${gameState.players.filter(p => p.id !== voter.id).map(p => `<option value="${p.id}">Player ${p.id}</option>`).join('')}
+        ${gameState.players.filter(p => p.id !== voter.id)
+          .map(p => `<option value="${p.id}">Manager ${p.id}</option>`).join('')}
       </select>
     </div>`
   ).join('');
@@ -679,20 +763,72 @@ document.getElementById('submit-all-votes').addEventListener('click', () => {
     const votedFor = parseInt(select.value);
     gameState.players.find(p => p.id === votedFor).votes++;
   });
-  gameState.players.forEach(p => p.score += p.votes * 2); // votes worth 2 pts each
-  document.getElementById('voting').classList.add('hidden');
+  gameState.players.forEach(p => p.score += p.votes * 2);
+  document.getElementById('voting-phase').classList.add('hidden');
   document.getElementById('final-results').classList.remove('hidden');
   displayFinalScores();
 });
 
+const MEDALS = ['🥇','🥈','🥉'];
+
 function displayFinalScores() {
-  const finalScoresDiv = document.getElementById('final-scores');
-  gameState.players.sort((a, b) => b.score - a.score);
-  const winner = gameState.players[0];
-  finalScoresDiv.innerHTML =
-    `<p>🏆 <strong>Winner: Player ${winner.id}</strong> with ${winner.score.toFixed(2)} points!</p>` +
-    gameState.players.map((p, i) =>
-      `<p>${i + 1}. Player ${p.id}: ${p.score.toFixed(2)} pts (Votes: ${p.votes})<br>
-       Squad: ${p.squad.map(pl => `${pl.name} [${pl.adjustedRating}]`).join(', ')}</p>`
-    ).join('');
+  const sorted = [...gameState.players].sort((a, b) => b.score - a.score);
+  const winner = sorted[0];
+
+  // ── Winner banner ──
+  document.getElementById('winner-banner').innerHTML = `
+    <div class="winner-crown">👑</div>
+    <div class="winner-name">Manager ${winner.id} Wins!</div>
+    <div class="winner-score">${winner.score.toFixed(2)} pts</div>
+  `;
+
+  // ── Leaderboard ──
+  document.getElementById('leaderboard').innerHTML = sorted.map((p, i) => {
+    const medal = MEDALS[i] || `${i+1}.`;
+    const isWinner = i === 0;
+    const formation = p.formation === 'defend' ? '4-3-3 Defend' : '4-3-3 Attack';
+    return `
+    <div class="lb-row${isWinner ? ' lb-winner' : ''}">
+      <span class="lb-medal">${medal}</span>
+      <span class="lb-label">Manager ${p.id}</span>
+      <span class="lb-formation">${formation}</span>
+      <div class="lb-stats">
+        <span class="lb-stat">⭐ ${p.avgRating.toFixed(1)}</span>
+        <span class="lb-stat">⚗️ ${p.totalChem}</span>
+        <span class="lb-stat">💰 $${p.budget}M left</span>
+        <span class="lb-stat">🗳️ ${p.votes} votes</span>
+      </div>
+      <span class="lb-total">${p.score.toFixed(2)}</span>
+    </div>`;
+  }).join('');
+
+  // ── Squad cards ──
+  document.getElementById('squad-showcase').innerHTML = sorted.map((p, i) => {
+    const medal = MEDALS[i] || '';
+    const formation = p.formation === 'defend' ? '4-3-3 Defend' : '4-3-3 Attack';
+    const captainName = p.captain ? p.captain.name : '—';
+    return `
+    <div class="squad-card${i === 0 ? ' squad-card-winner' : ''}">
+      <div class="squad-card-header">
+        <span class="squad-medal">${medal}</span>
+        <div>
+          <div class="squad-manager">Manager ${p.id}</div>
+          <div class="squad-meta">${formation} &nbsp;·&nbsp; 🎖 ${captainName}</div>
+        </div>
+        <div class="squad-pts">${p.score.toFixed(2)}<span class="squad-pts-label">pts</span></div>
+      </div>
+      ${buildMiniPitch(p)}
+      <div class="squad-player-list">
+        ${p.squad.map(pl => {
+          const isCaptain = p.captain && p.captain.name === pl.name;
+          return `<div class="spl-row">
+            <span class="spl-pos">${pl.assignedPos ? pl.assignedPos.replace(/\d+$/,'') : '?'}</span>
+            <span class="spl-name">${pl.name}${isCaptain ? ' 🎖' : ''}</span>
+            <span class="spl-club">${pl.club}</span>
+            <span class="spl-rating">${pl.adjustedRating}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
