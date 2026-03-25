@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FIFA Squad Builder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- TITLE / RULES SCREEN -->
+  <div id="title-screen" class="section">
+    <div class="title-hero">
+      <div class="title-badge">&#9917;</div>
+      <h1 class="title-main">FIFA Squad Builder</h1>
+      <p class="title-sub">The Ultimate Draft Challenge</p>
+    </div>
+
+    <div class="rules-grid">
+      <div class="rule-card"><div class="rule-icon">&#127919;</div><h3>Objective</h3><p>Build the highest-rated 11-player squad before your opponents do. Score points from ratings, chemistry, captain bonus, and peer votes.</p></div>
+      <div class="rule-card"><div class="rule-icon">&#128176;</div><h3>Budget</h3><p>Each manager starts with <strong>$1,000M</strong>. Spend wisely — leftover budget is penalised at the end of the game.</p></div>
+      <div class="rule-card"><div class="rule-icon">&#128260;</div><h3>Turn Order</h3><p>Turns rotate round-robin — Player 1 picks, then Player 2, then Player 3... You pick <strong>one footballer per turn</strong> then pass to the next manager.</p></div>
+      <div class="rule-card"><div class="rule-icon">&#127967;</div><h3>Formations</h3><p>Choose <strong>4-3-3 Attack</strong> (CAM) or <strong>4-3-3 Defend</strong> (DM) on your first turn. Your pitch layout adapts accordingly.</p></div>
+      <div class="rule-card"><div class="rule-icon">&#127922;</div><h3>Risk Pick</h3><p>Don't like your draw? Hit <strong>Risk Pick</strong> to reroll from the full pool. Limited to <strong>2 rerolls per selection</strong> — and you won't see the same player twice.</p></div>
+      <div class="rule-card"><div class="rule-icon">&#128205;</div><h3>Position Penalties</h3><p>Playing a player <strong>out of sub-role</strong> (e.g. CM at CAM) costs <strong>&#8722;$15M</strong>. Playing them in a <strong>different main category</strong> (e.g. defender as midfielder) costs <strong>&#8722;$30M</strong>.</p></div>
+      <div class="rule-card"><div class="rule-icon">&#9883;</div><h3>Chemistry</h3><p>Players sharing a <strong>club or country</strong> earn chemistry bonuses (up to +5 rating each). A cohesive squad can outscore a flashier one.</p></div>
+      <div class="rule-card"><div class="rule-icon">&#127894;</div><h3>Captain Bonus</h3><p>Once your squad is full, pick a <strong>captain</strong> for a permanent <strong>+2 rating boost</strong>. Choose your best player.</p></div>
+      <div class="rule-card"><div class="rule-icon">&#128434;</div><h3>Trading</h3><p>Sell a drawn footballer to another manager via a blind bid. The seller offers, the buyer bids, the seller accepts or rejects.</p></div>
+      <div class="rule-card"><div class="rule-icon">&#127942;</div><h3>Scoring</h3><p>Final score = <strong>Avg Rating + Captain Boost &#8722; Budget Penalty</strong>. Then each manager votes for the best rival squad — votes add <strong>+2 pts</strong> each.</p></div>
+    </div>
+
+    <div class="setup-box">
+      <h2>&#9881; Game Setup</h2>
+      <label class="setup-label">Number of Managers
+        <input type="number" id="num-players" min="2" max="6" value="4">
+      </label>
+      <button id="start-game" class="btn-start">Kick Off! &#128640;</button>
+    </div>
+  </div>
+
+  <!-- MAIN GAME AREA -->
+  <div id="game-area" class="section hidden">
+
+    <div id="formation-select" class="hidden">
+      <h3>Choose Your Formation</h3>
+      <select id="formation-choice">
+        <option value="attack">4-3-3 Attack (CAM)</option>
+        <option value="defend">4-3-3 Defend (CDM)</option>
+      </select>
+      <br><br>
+      <button id="confirm-formation">Confirm Formation</button>
+    </div>
+
+    <div id="turn-info">
+      <h2>Player <span id="current-player">1</span>'s Turn</h2>
+      <p>Budget: $<span id="budget">1000</span>M</p>
+    </div>
+
+    <h3 id="position-title" class="hidden">Choose a Position to Fill</h3>
+    <select id="position-select" class="hidden"></select>
+    <button id="get-player" class="hidden">Get Player</button>
+    <p id="position-display"></p>
+
+    <div id="sell-squad-section" class="hidden" style="background:#1e293b;padding:15px;border-radius:8px;max-width:400px;margin:10px auto;">
+      <h4 style="margin-top:0">Sell from Your Squad</h4>
+      <select id="sell-squad-select"></select>
+      <button id="sell-squad-btn">Sell Selected</button>
+    </div>
+
+    <div id="player-card" class="hidden">
+      <h3 id="player-name"></h3>
+      <p>Position: <span id="player-pos"></span></p>
+      <p>Rating: <span id="player-rating"></span></p>
+      <p>Price: $<span id="player-price"></span>M <span id="price-penalty-note" style="color:#f87171;font-size:13px;font-weight:bold;"></span></p>
+      <p>Club: <span id="player-club"></span></p>
+      <p>Country: <span id="player-country"></span></p>
+      <p>Assign to:
+        <select id="assign-pos"><option value="">Choose Position</option></select>
+      </p>
+      <div id="actions">
+        <button id="keep-player">&#10003; Keep</button>
+        <button id="skip-player">&#9197; Skip</button>
+        <button id="sell-player">&#128176; Sell to Player</button>
+        <button id="risk-pick">&#127922; Risk Pick (<span id="risk-picks-left">2</span> left)</button>
+      </div>
+    </div>
+
+    <div id="sell-interface" class="hidden">
+      <h3>Selling <span id="sell-player-name"></span></h3>
+      <p>Offer to:</p>
+      <select id="sell-to-player"></select>
+      <button id="offer-sell">Make Offer</button>
+      <div id="bid-section" class="hidden">
+        <p>Player <span id="bidder"></span>, enter your bid:</p>
+        <input type="number" id="bid-amount" min="1" placeholder="$M">
+        <button id="submit-bid">Submit Bid</button>
+      </div>
+      <div id="accept-section" class="hidden">
+        <p>Bid of $<span id="bid-value"></span>M from Player <span id="bidder-name"></span></p>
+        <button id="accept-bid">&#10003; Accept</button>
+        <button id="reject-bid">&#10007; Reject</button>
+      </div>
+    </div>
+
+    <!-- 4-3-3 Attack pitch -->
+    <div class="pitch" id="pitch-attack">
+      <div class="row"><div class="pos" data-pos="LW">LW</div><div class="pos" data-pos="ST">ST</div><div class="pos" data-pos="RW">RW</div></div>
+      <div class="row"><div class="pos" data-pos="CAM">CAM</div></div>
+      <div class="row"><div class="pos" data-pos="CM1">CM</div><div class="pos" data-pos="CM2">CM</div></div>
+      <div class="row"><div class="pos" data-pos="LB">LB</div><div class="pos" data-pos="CB1">CB</div><div class="pos" data-pos="CB2">CB</div><div class="pos" data-pos="RB">RB</div></div>
+      <div class="row"><div class="pos" data-pos="GK">GK</div></div>
+    </div>
+
+    <!-- 4-3-3 Defend pitch -->
+    <div class="pitch hidden" id="pitch-defend">
+      <div class="row"><div class="pos" data-pos="LW">LW</div><div class="pos" data-pos="ST">ST</div><div class="pos" data-pos="RW">RW</div></div>
+      <div class="row"><div class="pos" data-pos="CM1">CM</div><div class="pos" data-pos="CDM">DM</div><div class="pos" data-pos="CM2">CM</div></div>
+      <div class="row"><div class="pos" data-pos="LB">LB</div><div class="pos" data-pos="CB1">CB</div><div class="pos" data-pos="CB2">CB</div><div class="pos" data-pos="RB">RB</div></div>
+      <div class="row"><div class="pos" data-pos="GK">GK</div></div>
+    </div>
+
+    <!-- Trade position picker modal -->
+    <div id="trade-assign-modal" class="hidden" style="background:#1e3a5f;border:2px solid #f59e0b;padding:20px;border-radius:12px;max-width:400px;margin:15px auto;">
+      <h3 style="margin-top:0;color:#f59e0b;">&#128229; Place Traded Player</h3>
+      <p>Where should <strong id="trade-player-name"></strong> play?</p>
+      <select id="trade-assign-pos" style="width:100%;margin-bottom:12px;"></select>
+      <br><button id="trade-assign-confirm">&#10003; Confirm Position</button>
+    </div>
+
+    <div id="captain-select" class="hidden">
+      <h3>&#127894; Select Your Captain</h3>
+      <select id="captain-dropdown"></select>
+      <button id="set-captain">Set Captain (+2 Rating)</button>
+    </div>
+
+    <button id="next-turn" class="hidden">&#8594; Next Player's Turn</button>
+  </div>
+
+  <!-- GAME END -->
+  <div id="game-end" class="section hidden">
+    <h2>&#127937; Game Over</h2>
+    <div id="scores"></div>
+    <div id="voting">
+      <h3>Vote for Best Squad (not your own)</h3>
+      <div id="vote-list"></div>
+      <br>
+      <button id="submit-all-votes">Submit Votes</button>
+    </div>
+    <div id="final-results" class="hidden">
+      <h3>&#127942; Final Results</h3>
+      <div id="final-scores"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
