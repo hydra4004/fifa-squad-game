@@ -694,3 +694,29 @@ select {
   transform: none;
   box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
+
+/* ── Restart button ── */
+.restart-section {
+  text-align: center;
+  padding: 48px 0 32px;
+}
+
+.btn-restart {
+  padding: 18px 56px;
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 32px rgba(99,102,241,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-restart:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 40px rgba(99,102,241,0.55);
+  background: linear-gradient(135deg, #38bdf8, #818cf8);
+}

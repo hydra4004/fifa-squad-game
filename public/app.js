@@ -1,48 +1,202 @@
-let players = [
-{"name":"Kylian Mbappe","position":"ST","category":"attacker","rating":93,"price":120,"club":"PSG","country":"France"},
-{"name":"Erling Haaland","position":"ST","category":"attacker","rating":92,"price":115,"club":"Man City","country":"Norway"},
-{"name":"Vinicius Jr","position":"LW","category":"attacker","rating":91,"price":110,"club":"Real Madrid","country":"Brazil"},
-{"name":"Mohamed Salah","position":"RW","category":"attacker","rating":90,"price":105,"club":"Liverpool","country":"Egypt"},
-{"name":"Harry Kane","position":"ST","category":"attacker","rating":91,"price":108,"club":"Bayern","country":"England"},
-{"name":"Bukayo Saka","position":"RW","category":"attacker","rating":89,"price":95,"club":"Arsenal","country":"England"},
-{"name":"Phil Foden","position":"LW","category":"attacker","rating":90,"price":100,"club":"Man City","country":"England"},
-{"name":"Son Heung-min","position":"LW","category":"attacker","rating":88,"price":90,"club":"Tottenham","country":"South Korea"},
-{"name":"Lautaro Martinez","position":"ST","category":"attacker","rating":89,"price":100,"club":"Inter","country":"Argentina"},
-{"name":"Victor Osimhen","position":"ST","category":"attacker","rating":88,"price":95,"club":"Napoli","country":"Nigeria"},
-{"name":"Rafael Leao","position":"LW","category":"attacker","rating":87,"price":85,"club":"AC Milan","country":"Portugal"},
-{"name":"Jadon Sancho","position":"RW","category":"attacker","rating":86,"price":80,"club":"Man Utd","country":"England"},
-{"name":"Raphinha","position":"RW","category":"attacker","rating":85,"price":75,"club":"Barcelona","country":"Brazil"},
-{"name":"Gabriel Jesus","position":"ST","category":"attacker","rating":87,"price":85,"club":"Arsenal","country":"Brazil"},
-{"name":"Kevin De Bruyne","position":"CM","category":"midfielder","rating":92,"price":115,"club":"Man City","country":"Belgium"},
-{"name":"Jude Bellingham","position":"CAM","category":"midfielder","rating":91,"price":110,"club":"Real Madrid","country":"England"},
-{"name":"Luka Modric","position":"CM","category":"midfielder","rating":88,"price":85,"club":"Real Madrid","country":"Croatia"},
-{"name":"Rodri","position":"CDM","category":"midfielder","rating":90,"price":105,"club":"Man City","country":"Spain"},
-{"name":"Bernardo Silva","position":"CM","category":"midfielder","rating":89,"price":95,"club":"Man City","country":"Portugal"},
-{"name":"Bruno Fernandes","position":"CAM","category":"midfielder","rating":88,"price":90,"club":"Man Utd","country":"Portugal"},
-{"name":"Pedri","position":"CM","category":"midfielder","rating":87,"price":85,"club":"Barcelona","country":"Spain"},
-{"name":"Frenkie de Jong","position":"CM","category":"midfielder","rating":88,"price":90,"club":"Barcelona","country":"Netherlands"},
-{"name":"Joshua Kimmich","position":"CDM","category":"midfielder","rating":89,"price":95,"club":"Bayern","country":"Germany"},
-{"name":"Martin Odegaard","position":"CAM","category":"midfielder","rating":87,"price":85,"club":"Arsenal","country":"Norway"},
-{"name":"James Maddison","position":"CAM","category":"midfielder","rating":86,"price":80,"club":"Tottenham","country":"England"},
-{"name":"Enzo Fernandez","position":"CDM","category":"midfielder","rating":85,"price":75,"club":"Chelsea","country":"Argentina"},
-{"name":"Virgil van Dijk","position":"CB","category":"defender","rating":91,"price":110,"club":"Liverpool","country":"Netherlands"},
-{"name":"Ruben Dias","position":"CB","category":"defender","rating":90,"price":105,"club":"Man City","country":"Portugal"},
-{"name":"Marquinhos","position":"CB","category":"defender","rating":89,"price":95,"club":"PSG","country":"Brazil"},
-{"name":"Antonio Rudiger","position":"CB","category":"defender","rating":88,"price":90,"club":"Real Madrid","country":"Germany"},
-{"name":"Achraf Hakimi","position":"RB","category":"defender","rating":88,"price":90,"club":"PSG","country":"Morocco"},
-{"name":"Theo Hernandez","position":"LB","category":"defender","rating":87,"price":85,"club":"AC Milan","country":"France"},
-{"name":"Trent Alexander-Arnold","position":"RB","category":"defender","rating":88,"price":90,"club":"Liverpool","country":"England"},
-{"name":"Joao Cancelo","position":"LB","category":"defender","rating":87,"price":85,"club":"Barcelona","country":"Portugal"},
-{"name":"John Stones","position":"CB","category":"defender","rating":86,"price":80,"club":"Man City","country":"England"},
-{"name":"Reece James","position":"RB","category":"defender","rating":85,"price":75,"club":"Chelsea","country":"England"},
-{"name":"Alphonso Davies","position":"LB","category":"defender","rating":86,"price":80,"club":"Bayern","country":"Canada"},
-{"name":"Thibaut Courtois","position":"GK","category":"goalkeeper","rating":91,"price":105,"club":"Real Madrid","country":"Belgium"},
-{"name":"Alisson Becker","position":"GK","category":"goalkeeper","rating":90,"price":100,"club":"Liverpool","country":"Brazil"},
-{"name":"Ederson","position":"GK","category":"goalkeeper","rating":89,"price":95,"club":"Man City","country":"Brazil"},
-{"name":"Marc-Andre ter Stegen","position":"GK","category":"goalkeeper","rating":90,"price":100,"club":"Barcelona","country":"Germany"},
-{"name":"Gianluigi Donnarumma","position":"GK","category":"goalkeeper","rating":88,"price":90,"club":"PSG","country":"Italy"},
-{"name":"Aaron Ramsdale","position":"GK","category":"goalkeeper","rating":85,"price":75,"club":"Arsenal","country":"England"}
+// Price formula: ~(rating - 50) * 3  +/- small manual tweak per player
+const BASE_PLAYERS = [
+// ── STRIKERS (ST) ──────────────────────────────────────────────────────────
+{"name":"Kylian Mbappe",       "position":"ST","category":"attacker","rating":93,"price":130,"club":"Real Madrid","country":"France"},
+{"name":"Erling Haaland",      "position":"ST","category":"attacker","rating":92,"price":122,"club":"Man City",   "country":"Norway"},
+{"name":"Harry Kane",          "position":"ST","category":"attacker","rating":91,"price":114,"club":"Bayern",     "country":"England"},
+{"name":"Lautaro Martinez",    "position":"ST","category":"attacker","rating":89,"price":100,"club":"Inter",      "country":"Argentina"},
+{"name":"Victor Osimhen",      "position":"ST","category":"attacker","rating":88,"price":93, "club":"Galatasaray","country":"Nigeria"},
+{"name":"Gabriel Jesus",       "position":"ST","category":"attacker","rating":86,"price":79, "club":"Arsenal",    "country":"Brazil"},
+{"name":"Richarlison",         "position":"ST","category":"attacker","rating":85,"price":73, "club":"Tottenham",  "country":"Brazil"},
+{"name":"Darwin Nunez",        "position":"ST","category":"attacker","rating":85,"price":73, "club":"Liverpool",  "country":"Uruguay"},
+{"name":"Alvaro Morata",       "position":"ST","category":"attacker","rating":84,"price":67, "club":"AC Milan",   "country":"Spain"},
+{"name":"Olivier Giroud",      "position":"ST","category":"attacker","rating":83,"price":61, "club":"LA Galaxy",  "country":"France"},
+{"name":"Romelu Lukaku",       "position":"ST","category":"attacker","rating":84,"price":67, "club":"Napoli",     "country":"Belgium"},
+{"name":"Wissam Ben Yedder",   "position":"ST","category":"attacker","rating":83,"price":61, "club":"Monaco",     "country":"France"},
+{"name":"Artem Dovbyk",        "position":"ST","category":"attacker","rating":84,"price":67, "club":"Roma",       "country":"Ukraine"},
+{"name":"Jonathan David",      "position":"ST","category":"attacker","rating":86,"price":79, "club":"Lille",      "country":"Canada"},
+// ── LEFT WINGERS (LW) ──────────────────────────────────────────────────────
+{"name":"Vinicius Jr",         "position":"LW","category":"attacker","rating":92,"price":122,"club":"Real Madrid","country":"Brazil"},
+{"name":"Phil Foden",          "position":"LW","category":"attacker","rating":90,"price":108,"club":"Man City",   "country":"England"},
+{"name":"Son Heung-min",       "position":"LW","category":"attacker","rating":88,"price":93, "club":"Tottenham",  "country":"South Korea"},
+{"name":"Rafael Leao",         "position":"LW","category":"attacker","rating":87,"price":86, "club":"AC Milan",   "country":"Portugal"},
+{"name":"Leroy Sane",          "position":"LW","category":"attacker","rating":86,"price":79, "club":"Bayern",     "country":"Germany"},
+{"name":"Luis Diaz",           "position":"LW","category":"attacker","rating":86,"price":79, "club":"Liverpool",  "country":"Colombia"},
+{"name":"Ousmane Dembele",     "position":"LW","category":"attacker","rating":87,"price":86, "club":"PSG",        "country":"France"},
+{"name":"Nicolas Gonzalez",    "position":"LW","category":"attacker","rating":83,"price":61, "club":"Juventus",   "country":"Argentina"},
+{"name":"Noni Madueke",        "position":"LW","category":"attacker","rating":83,"price":61, "club":"Chelsea",    "country":"England"},
+{"name":"Alejandro Garnacho",  "position":"LW","category":"attacker","rating":84,"price":67, "club":"Man Utd",    "country":"Argentina"},
+{"name":"Michael Olise",       "position":"LW","category":"attacker","rating":85,"price":73, "club":"Bayern",     "country":"France"},
+{"name":"Gabriel Martinelli",  "position":"LW","category":"attacker","rating":85,"price":73, "club":"Arsenal",    "country":"Brazil"},
+// ── RIGHT WINGERS (RW) ─────────────────────────────────────────────────────
+{"name":"Mohamed Salah",       "position":"RW","category":"attacker","rating":91,"price":114,"club":"Liverpool",  "country":"Egypt"},
+{"name":"Bukayo Saka",         "position":"RW","category":"attacker","rating":89,"price":100,"club":"Arsenal",    "country":"England"},
+{"name":"Jadon Sancho",        "position":"RW","category":"attacker","rating":85,"price":73, "club":"Chelsea",    "country":"England"},
+{"name":"Raphinha",            "position":"RW","category":"attacker","rating":86,"price":79, "club":"Barcelona",  "country":"Brazil"},
+{"name":"Federico Chiesa",     "position":"RW","category":"attacker","rating":85,"price":73, "club":"Liverpool",  "country":"Italy"},
+{"name":"Heung-min Son",       "position":"RW","category":"attacker","rating":88,"price":93, "club":"Tottenham",  "country":"South Korea"},
+{"name":"Antony",              "position":"RW","category":"attacker","rating":83,"price":61, "club":"Man Utd",    "country":"Brazil"},
+{"name":"Khvicha Kvaratskhelia","position":"RW","category":"attacker","rating":88,"price":93,"club":"PSG",        "country":"Georgia"},
+{"name":"Christopher Nkunku",  "position":"RW","category":"attacker","rating":86,"price":79, "club":"Chelsea",    "country":"France"},
+{"name":"Marcus Rashford",     "position":"RW","category":"attacker","rating":84,"price":67, "club":"Man Utd",    "country":"England"},
+{"name":"Florian Wirtz",       "position":"RW","category":"attacker","rating":89,"price":100,"club":"Bayer Leverkusen","country":"Germany"},
+{"name":"Lamine Yamal",        "position":"RW","category":"attacker","rating":87,"price":86, "club":"Barcelona",  "country":"Spain"},
+// ── ATTACKING MIDFIELDERS (CAM) ────────────────────────────────────────────
+{"name":"Jude Bellingham",     "position":"CAM","category":"midfielder","rating":91,"price":114,"club":"Real Madrid","country":"England"},
+{"name":"Bruno Fernandes",     "position":"CAM","category":"midfielder","rating":88,"price":93, "club":"Man Utd",    "country":"Portugal"},
+{"name":"Martin Odegaard",     "position":"CAM","category":"midfielder","rating":87,"price":86, "club":"Arsenal",    "country":"Norway"},
+{"name":"James Maddison",      "position":"CAM","category":"midfielder","rating":86,"price":79, "club":"Tottenham",  "country":"England"},
+{"name":"Bernardo Silva",      "position":"CAM","category":"midfielder","rating":89,"price":100,"club":"Man City",   "country":"Portugal"},
+{"name":"Dani Olmo",           "position":"CAM","category":"midfielder","rating":86,"price":79, "club":"Barcelona",  "country":"Spain"},
+{"name":"Paulo Dybala",        "position":"CAM","category":"midfielder","rating":86,"price":79, "club":"Roma",        "country":"Argentina"},
+{"name":"Hakim Ziyech",        "position":"CAM","category":"midfielder","rating":84,"price":67, "club":"Galatasaray", "country":"Morocco"},
+{"name":"Dominik Szoboszlai",  "position":"CAM","category":"midfielder","rating":85,"price":73, "club":"Liverpool",   "country":"Hungary"},
+{"name":"Riqui Puig",          "position":"CAM","category":"midfielder","rating":82,"price":58, "club":"Real Betis",  "country":"Spain"},
+{"name":"Mason Mount",         "position":"CAM","category":"midfielder","rating":83,"price":61, "club":"Man Utd",     "country":"England"},
+{"name":"Kai Havertz",         "position":"CAM","category":"midfielder","rating":85,"price":73, "club":"Arsenal",     "country":"Germany"},
+// ── CENTRAL MIDFIELDERS (CM) ───────────────────────────────────────────────
+{"name":"Kevin De Bruyne",     "position":"CM","category":"midfielder","rating":91,"price":114,"club":"Man City",   "country":"Belgium"},
+{"name":"Luka Modric",         "position":"CM","category":"midfielder","rating":87,"price":86, "club":"Real Madrid","country":"Croatia"},
+{"name":"Pedri",               "position":"CM","category":"midfielder","rating":88,"price":93, "club":"Barcelona",  "country":"Spain"},
+{"name":"Frenkie de Jong",     "position":"CM","category":"midfielder","rating":87,"price":86, "club":"Barcelona",  "country":"Netherlands"},
+{"name":"Toni Kroos",          "position":"CM","category":"midfielder","rating":88,"price":93, "club":"Real Madrid","country":"Germany"},
+{"name":"Nicolo Barella",      "position":"CM","category":"midfielder","rating":87,"price":86, "club":"Inter",       "country":"Italy"},
+{"name":"Gavi",                "position":"CM","category":"midfielder","rating":87,"price":86, "club":"Barcelona",  "country":"Spain"},
+{"name":"Ilkay Gundogan",      "position":"CM","category":"midfielder","rating":86,"price":79, "club":"Barcelona",  "country":"Germany"},
+{"name":"Leon Goretzka",       "position":"CM","category":"midfielder","rating":85,"price":73, "club":"Bayern",     "country":"Germany"},
+{"name":"Mateo Kovacic",       "position":"CM","category":"midfielder","rating":84,"price":67, "club":"Man City",   "country":"Croatia"},
+{"name":"Declan Rice",         "position":"CM","category":"midfielder","rating":87,"price":86, "club":"Arsenal",    "country":"England"},
+{"name":"Aurelien Tchouameni", "position":"CM","category":"midfielder","rating":85,"price":73, "club":"Real Madrid","country":"France"},
+// ── DEFENSIVE MIDFIELDERS (CDM) ────────────────────────────────────────────
+{"name":"Rodri",               "position":"CDM","category":"midfielder","rating":91,"price":114,"club":"Man City",   "country":"Spain"},
+{"name":"Joshua Kimmich",      "position":"CDM","category":"midfielder","rating":88,"price":93, "club":"Bayern",     "country":"Germany"},
+{"name":"Enzo Fernandez",      "position":"CDM","category":"midfielder","rating":85,"price":73, "club":"Chelsea",    "country":"Argentina"},
+{"name":"Casemiro",            "position":"CDM","category":"midfielder","rating":86,"price":79, "club":"Man Utd",    "country":"Brazil"},
+{"name":"N'Golo Kante",        "position":"CDM","category":"midfielder","rating":86,"price":79, "club":"Al-Ittihad","country":"France"},
+{"name":"Fabinho",             "position":"CDM","category":"midfielder","rating":85,"price":73, "club":"Al-Ittihad","country":"Brazil"},
+{"name":"Sandro Tonali",       "position":"CDM","category":"midfielder","rating":85,"price":73, "club":"Newcastle",  "country":"Italy"},
+{"name":"Granit Xhaka",        "position":"CDM","category":"midfielder","rating":84,"price":67, "club":"Bayer Leverkusen","country":"Switzerland"},
+{"name":"Alexis Mac Allister",  "position":"CDM","category":"midfielder","rating":85,"price":73, "club":"Liverpool",  "country":"Argentina"},
+{"name":"Manuel Locatelli",    "position":"CDM","category":"midfielder","rating":83,"price":61, "club":"Juventus",   "country":"Italy"},
+{"name":"Ruben Neves",         "position":"CDM","category":"midfielder","rating":84,"price":67, "club":"Al-Hilal",   "country":"Portugal"},
+{"name":"Youri Tielemans",     "position":"CDM","category":"midfielder","rating":83,"price":61, "club":"Aston Villa","country":"Belgium"},
+{"name":"Moises Caicedo",      "position":"CDM","category":"midfielder","rating":84,"price":67, "club":"Chelsea",    "country":"Ecuador"},
+// ── CENTRE BACKS (CB) ──────────────────────────────────────────────────────
+{"name":"Virgil van Dijk",     "position":"CB","category":"defender","rating":91,"price":114,"club":"Liverpool",  "country":"Netherlands"},
+{"name":"Ruben Dias",          "position":"CB","category":"defender","rating":90,"price":108,"club":"Man City",   "country":"Portugal"},
+{"name":"Marquinhos",          "position":"CB","category":"defender","rating":89,"price":100,"club":"PSG",        "country":"Brazil"},
+{"name":"Antonio Rudiger",     "position":"CB","category":"defender","rating":88,"price":93, "club":"Real Madrid","country":"Germany"},
+{"name":"John Stones",         "position":"CB","category":"defender","rating":86,"price":79, "club":"Man City",   "country":"England"},
+{"name":"Milan Skriniar",      "position":"CB","category":"defender","rating":87,"price":86, "club":"PSG",        "country":"Slovakia"},
+{"name":"Ronald Araujo",       "position":"CB","category":"defender","rating":87,"price":86, "club":"Barcelona",  "country":"Uruguay"},
+{"name":"William Saliba",      "position":"CB","category":"defender","rating":87,"price":86, "club":"Arsenal",    "country":"France"},
+{"name":"Dayot Upamecano",     "position":"CB","category":"defender","rating":86,"price":79, "club":"Bayern",     "country":"France"},
+{"name":"Eder Militao",        "position":"CB","category":"defender","rating":87,"price":86, "club":"Real Madrid","country":"Brazil"},
+{"name":"Kim Min-jae",         "position":"CB","category":"defender","rating":87,"price":86, "club":"Bayern",     "country":"South Korea"},
+{"name":"Lisandro Martinez",   "position":"CB","category":"defender","rating":86,"price":79, "club":"Man Utd",    "country":"Argentina"},
+{"name":"Goncalo Inacio",      "position":"CB","category":"defender","rating":84,"price":67, "club":"Sporting CP","country":"Portugal"},
+{"name":"Cristian Romero",     "position":"CB","category":"defender","rating":86,"price":79, "club":"Tottenham",  "country":"Argentina"},
+// ── RIGHT BACKS (RB) ───────────────────────────────────────────────────────
+{"name":"Achraf Hakimi",       "position":"RB","category":"defender","rating":88,"price":93, "club":"PSG",        "country":"Morocco"},
+{"name":"Trent Alexander-Arnold","position":"RB","category":"defender","rating":88,"price":93,"club":"Real Madrid","country":"England"},
+{"name":"Reece James",         "position":"RB","category":"defender","rating":85,"price":73, "club":"Chelsea",    "country":"England"},
+{"name":"Benjamin Pavard",     "position":"RB","category":"defender","rating":85,"price":73, "club":"Inter",      "country":"France"},
+{"name":"Denzel Dumfries",     "position":"RB","category":"defender","rating":84,"price":67, "club":"Inter",      "country":"Netherlands"},
+{"name":"Kyle Walker",         "position":"RB","category":"defender","rating":84,"price":67, "club":"Man City",   "country":"England"},
+{"name":"Noussair Mazraoui",   "position":"RB","category":"defender","rating":83,"price":61, "club":"Man Utd",    "country":"Morocco"},
+{"name":"Bouna Sarr",          "position":"RB","category":"defender","rating":81,"price":50, "club":"Bayern",     "country":"Senegal"},
+{"name":"Pedro Porro",         "position":"RB","category":"defender","rating":84,"price":67, "club":"Tottenham",  "country":"Spain"},
+{"name":"Diogo Dalot",         "position":"RB","category":"defender","rating":83,"price":61, "club":"Man Utd",    "country":"Portugal"},
+{"name":"Valentin Carboni",    "position":"RB","category":"defender","rating":81,"price":50, "club":"Inter",      "country":"Argentina"},
+// ── LEFT BACKS (LB) ────────────────────────────────────────────────────────
+{"name":"Theo Hernandez",      "position":"LB","category":"defender","rating":87,"price":86, "club":"AC Milan",   "country":"France"},
+{"name":"Joao Cancelo",        "position":"LB","category":"defender","rating":86,"price":79, "club":"Barcelona",  "country":"Portugal"},
+{"name":"Alphonso Davies",     "position":"LB","category":"defender","rating":86,"price":79, "club":"Bayern",     "country":"Canada"},
+{"name":"Andrew Robertson",    "position":"LB","category":"defender","rating":86,"price":79, "club":"Liverpool",  "country":"Scotland"},
+{"name":"Ferdi Kadioglu",      "position":"LB","category":"defender","rating":83,"price":61, "club":"Brighton",   "country":"Turkey"},
+{"name":"Alejandro Balde",     "position":"LB","category":"defender","rating":85,"price":73, "club":"Barcelona",  "country":"Spain"},
+{"name":"Destiny Udogie",      "position":"LB","category":"defender","rating":83,"price":61, "club":"Tottenham",  "country":"Italy"},
+{"name":"Ben Chilwell",        "position":"LB","category":"defender","rating":82,"price":58, "club":"Chelsea",    "country":"England"},
+{"name":"Lucas Hernandez",     "position":"LB","category":"defender","rating":84,"price":67, "club":"PSG",        "country":"France"},
+{"name":"Tyrick Mitchell",     "position":"LB","category":"defender","rating":81,"price":50, "club":"Crystal Palace","country":"England"},
+{"name":"Marc Cucurella",      "position":"LB","category":"defender","rating":83,"price":61, "club":"Chelsea",    "country":"Spain"},
+// ── GOALKEEPERS (GK) ───────────────────────────────────────────────────────
+{"name":"Thibaut Courtois",    "position":"GK","category":"goalkeeper","rating":91,"price":114,"club":"Real Madrid","country":"Belgium"},
+{"name":"Alisson Becker",      "position":"GK","category":"goalkeeper","rating":90,"price":108,"club":"Liverpool",  "country":"Brazil"},
+{"name":"Ederson",             "position":"GK","category":"goalkeeper","rating":89,"price":100,"club":"Man City",   "country":"Brazil"},
+{"name":"Marc-Andre ter Stegen","position":"GK","category":"goalkeeper","rating":90,"price":108,"club":"Barcelona", "country":"Germany"},
+{"name":"Gianluigi Donnarumma","position":"GK","category":"goalkeeper","rating":88,"price":93, "club":"PSG",        "country":"Italy"},
+{"name":"Mike Maignan",        "position":"GK","category":"goalkeeper","rating":87,"price":86, "club":"AC Milan",   "country":"France"},
+{"name":"Jan Oblak",           "position":"GK","category":"goalkeeper","rating":88,"price":93, "club":"Atletico",   "country":"Slovenia"},
+{"name":"Andre Onana",         "position":"GK","category":"goalkeeper","rating":85,"price":73, "club":"Man Utd",    "country":"Cameroon"},
+{"name":"David Raya",          "position":"GK","category":"goalkeeper","rating":85,"price":73, "club":"Arsenal",    "country":"Spain"},
+{"name":"Manuel Neuer",        "position":"GK","category":"goalkeeper","rating":87,"price":86, "club":"Bayern",     "country":"Germany"},
+{"name":"Gregor Kobel",        "position":"GK","category":"goalkeeper","rating":85,"price":73, "club":"Dortmund",   "country":"Switzerland"},
+{"name":"Aaron Ramsdale",      "position":"GK","category":"goalkeeper","rating":84,"price":67, "club":"Southampton","country":"England"},
+{"name":"Giorgi Mamardashvili","position":"GK","category":"goalkeeper","rating":84,"price":67, "club":"Valencia",   "country":"Georgia"},
+{"name":"Yann Sommer",         "position":"GK","category":"goalkeeper","rating":85,"price":73, "club":"Inter",      "country":"Switzerland"},
+{"name":"Unai Simon",          "position":"GK","category":"goalkeeper","rating":84,"price":67, "club":"Athletic Club","country":"Spain"}
 ];
+
+// ─── Dynamic market generator ─────────────────────────────────────────────────
+// Each game, every player gets a realistic price fluctuation (+/-) and a tiny
+// rating shift derived from that fluctuation.
+//
+// Logic:
+//   1. base price stays in BASE_PLAYERS (never mutated).
+//   2. Each game we roll a market swing factor per player tier:
+//        Elite (91-93): price range roughly 90-150M  → swing ±22%
+//        Star  (88-90): price range roughly 70-125M  → swing ±20%
+//        Good  (85-87): price range roughly 50-100M  → swing ±18%
+//        Solid (81-84): price range roughly 35-80M   → swing ±15%
+//   3. Rating shifts ±0-2 OVR relative to the % shift in price:
+//        price went up  >12% → rating +1 or +2
+//        price roughly flat   → rating ±0
+//        price went down>12% → rating -1 or -2
+//      Capped so no player exceeds 95 or drops below 78.
+
+function generateMarketPrices() {
+  return BASE_PLAYERS.map(base => {
+    const p = Object.assign({}, base);
+
+    // Tier swing range
+    let swingPct;
+    if      (p.rating >= 91) swingPct = 0.22;
+    else if (p.rating >= 88) swingPct = 0.20;
+    else if (p.rating >= 85) swingPct = 0.18;
+    else                     swingPct = 0.15;
+
+    // Random swing factor: -swingPct to +swingPct
+    const swing = (Math.random() * 2 - 1) * swingPct;   // e.g. -0.22 to +0.22
+
+    // Apply swing to base price, round to nearest 5M for realism
+    let newPrice = Math.round((p.price * (1 + swing)) / 5) * 5;
+
+    // Hard floor/ceiling by tier so values stay realistic
+    if      (p.rating >= 91) { newPrice = Math.max(90,  Math.min(150, newPrice)); }
+    else if (p.rating >= 88) { newPrice = Math.max(70,  Math.min(125, newPrice)); }
+    else if (p.rating >= 85) { newPrice = Math.max(50,  Math.min(100, newPrice)); }
+    else                     { newPrice = Math.max(35,  Math.min(80,  newPrice)); }
+
+    // Derive rating shift from actual price change %
+    const actualSwingPct = (newPrice - p.price) / p.price;
+    let ratingShift = 0;
+    if      (actualSwingPct >  0.15) ratingShift = 2;
+    else if (actualSwingPct >  0.07) ratingShift = 1;
+    else if (actualSwingPct < -0.15) ratingShift = -2;
+    else if (actualSwingPct < -0.07) ratingShift = -1;
+
+    p.price       = newPrice;
+    p.baseRating  = p.rating;           // remember original for display
+    p.rating      = Math.max(78, Math.min(95, p.rating + ratingShift));
+    p.priceSwing  = actualSwingPct;     // store for potential UI hint
+
+    return p;
+  });
+}
+
+// Deep-copy with dynamic pricing — regenerated fresh each game
+let players = generateMarketPrices();
 
 let numPlayers = 4;
 let currentPlayer = 1;
@@ -164,9 +318,31 @@ function recalculateChemistry(player) {
 function showPlayerCard(p) {
   document.getElementById('player-name').textContent = p.name;
   document.getElementById('player-pos').textContent = p.position;
-  document.getElementById('player-rating').textContent = p.rating;
-  document.getElementById('player-price').textContent = p.price;
-  document.getElementById('player-club').textContent = p.club;
+
+  // Rating: show current + base if they differ
+  const ratingEl = document.getElementById('player-rating');
+  if (p.baseRating && p.baseRating !== p.rating) {
+    const diff = p.rating - p.baseRating;
+    ratingEl.innerHTML = p.rating +
+      ' <span style="font-size:12px;color:' + (diff > 0 ? '#4ade80' : '#f87171') + '">' +
+      (diff > 0 ? '(+' + diff + ')' : '(' + diff + ')') + '</span>';
+  } else {
+    ratingEl.textContent = p.rating;
+  }
+
+  // Price: show with market swing arrow
+  const priceEl = document.getElementById('player-price');
+  if (p.priceSwing !== undefined && Math.abs(p.priceSwing) > 0.02) {
+    const arrow  = p.priceSwing > 0 ? '▲' : '▼';
+    const colour = p.priceSwing > 0 ? '#4ade80' : '#f87171';
+    const pct    = Math.abs(Math.round(p.priceSwing * 100));
+    priceEl.innerHTML = p.price +
+      ' <span style="font-size:12px;color:' + colour + '">' + arrow + pct + '%</span>';
+  } else {
+    priceEl.textContent = p.price;
+  }
+
+  document.getElementById('player-club').textContent    = p.club;
   document.getElementById('player-country').textContent = p.country;
 
   const player = gameState.players[currentPlayer - 1];
@@ -832,3 +1008,35 @@ function displayFinalScores() {
     </div>`;
   }).join('');
 }
+
+// ─── Restart game ─────────────────────────────────────────────────────────────
+
+function restartGame() {
+  // Reset player pool with fresh market prices each game
+  players = generateMarketPrices();
+
+  // Reset all game state
+  numPlayers     = 4;
+  currentPlayer  = 1;
+  gameState      = {};
+  currentPosition     = null;
+  currentPlayerData   = null;
+  sellingPlayer       = null;
+  pendingTrade        = null;
+  riskPicksLeft  = 2;
+  riskPickSeen   = new Set();
+
+  // Hide game-end, show title screen
+  document.getElementById('game-end').classList.add('hidden');
+  document.getElementById('game-area').classList.add('hidden');
+  document.getElementById('final-results').classList.add('hidden');
+  document.getElementById('voting-phase').classList.remove('hidden');
+
+  // Reset the num-players input to 4
+  document.getElementById('num-players').value = 4;
+
+  // Show title screen
+  document.getElementById('title-screen').classList.remove('hidden');
+}
+
+document.getElementById('restart-game').addEventListener('click', restartGame);
